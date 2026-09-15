@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal AI Dashboard</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(23, 27, 44, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #a855f7;
+      --accent-glow: rgba(168, 85, 247, 0.25);
+      --accent-secondary: #06b6d4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* Modern Top Header Layout */
+    .header-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-title h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 0.6rem 1.25rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .nav-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Asymmetric Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(168, 85, 247, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      color: var(--accent-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Card Spans & Positioning */
+    #time-sec { grid-column: span 12; }
+    #weather-sec { grid-column: span 7; }
+    #currency-sec { grid-column: span 5; }
+
+    @media (max-width: 900px) {
+      .header-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+      }
+      #weather-sec, #currency-sec, #time-sec {
+        grid-column: span 12;
+      }
+    }
+
+    /* Horizontal Clocks Layout */
+    .clocks-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .clock-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .clock-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .clock-time {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Weather Styling */
+    .weather-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .weather-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.25rem;
+      border-radius: 12px;
+    }
+
+    .weather-item strong {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .weather-val {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Currency Inputs */
+    .converter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .converter-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .converter-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .converter-group input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .converter-group input:focus {
+      border-color: var(--accent);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-banner">
+      <div class="header-title">
+        <h1 id="greeting">Hello!</h1>
+        <p id="current-date">Loading date...</p>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showSection('all', event)">All</button>
+        <button class="nav-btn" onclick="showSection('time-sec', event)">Time</button>
+        <button class="nav-btn" onclick="showSection('weather-sec', event)">Weather</button>
+        <button class="nav-btn" onclick="showSection('currency-sec', event)">Currency</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Time Section (Top Banner Card) -->
+      <div class="card section" id="time-sec">
+        <h2><span>⏰</span> World Clocks</h2>
+        <div class="clocks-container">
+          <div class="clock-item">
+            <div class="clock-label">Chiang Mai, Thailand</div>
+            <div class="clock-time" id="clock-cm">--:--:--</div>
+          </div>
+          <div class="clock-item">
+            <div class="clock-label">Hometown / UTC</div>
+            <div class="clock-time" id="clock-home">--:--:--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather Section -->
+      <div class="card section" id="weather-sec">
+        <h2><span>🌤️</span> Chiang Mai Weather</h2>
+        <div class="weather-box">
+          <div class="weather-item">
+            <strong>Today</strong>
+            <div class="weather-val" id="weather-current">Loading...</div>
+          </div>
+          <div class="weather-item">
+            <strong>Tomorrow</strong>
+            <div class="weather-val" id="weather-tomorrow">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Currency Section -->
+      <div class="card section" id="currency-sec">
+        <h2><span>💱</span> Currency Exchange</h2>
+        <div class="converter-group">
+          <label for="usd-input">USD ($)</label>
+          <input type="number" id="usd-input" value="1" oninput="convertFromUSD(this.value)">
+        </div>
+        <div class="converter-group">
+          <label for="thb-input">THB (฿)</label>
+          <input type="number" id="thb-input" oninput="convertFromTHB(this.value)">
+        </div>
+        <div class="converter-group">
+          <label for="mmk-input">MMK (K)</label>
+          <input type="number" id="mmk-input" oninput="convertFromMMK(this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. Greeting & Date ---
+    function updateGreeting() {
+      const now = new Date();
+      const hrs = now.getHours();
+      let greet = "Good Evening";
+      if (hrs < 12) greet = "Good Morning";
+      else if (hrs < 18) greet = "Good Afternoon";
+
+      document.getElementById('greeting').innerText = `${greet}!`;
+      document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    // --- 2. Live Clocks ---
+    function updateClocks() {
+      const now = new Date();
+      
+      const cmTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+      document.getElementById('clock-cm').innerText = cmTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+
+      const homeTime = new Date(now.toLocaleString("en-US", {timeZone: "UTC"}));
+      document.getElementById('clock-home').innerText = homeTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}) + " UTC";
+    }
+
+    // --- 3. Section Toggle Buttons ---
+    function showSection(sectionId, event) {
+      const sections = document.querySelectorAll('.section');
+      const buttons = document.querySelectorAll('.nav-btn');
+      
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (sectionId === 'all') {
+        sections.forEach(s => s.classList.remove('hidden'));
+      } else {
+        sections.forEach(s => {
+          if (s.id === sectionId) {
+            s.classList.remove('hidden');
+          } else {
+            s.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    // --- 4. Weather API ---
+    async function fetchWeather() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=18.7883&longitude=98.9853&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok');
+        const data = await res.json();
+        
+        const currentTemp = Math.round(data.current_weather.temperature);
+        const tomorrowMax = Math.round(data.daily.temperature_2m_max[1]);
+        const tomorrowMin = Math.round(data.daily.temperature_2m_min[1]);
+
+        document.getElementById('weather-current').innerText = `${currentTemp}°C`;
+        document.getElementById('weather-tomorrow').innerText = `${tomorrowMax}° / ${tomorrowMin}°C`;
+      } catch (err) {
+        document.getElementById('weather-current').innerText = 'N/A';
+        document.getElementById('weather-tomorrow').innerText = 'N/A';
+      }
+    }
+
+    // --- 5. Currency API ---
+    let rates = { THB: 35.0, MMK: 2100.0 };
+
+    async function fetchRates() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        if (data.rates.THB) rates.THB = data.rates.THB;
+        if (data.rates.MMK) rates.MMK = data.rates.MMK;
+        convertFromUSD(1);
+      } catch (err) {
+        convertFromUSD(1);
+      }
+    }
+
+    function convertFromUSD(val) {
+      const usd = parseFloat(val) || 0;
+      document.getElementById('thb-input').value = (usd * rates.THB).toFixed(2);
+      document.getElementById('mmk-input').value = (usd * rates.MMK).toFixed(2);
+    }
+
+    function convertFromTHB(val) {
+      const thb = parseFloat(val) || 0;
+      const usd = thb / rates.THB;
+      document.getElementById('usd-input').value = usd.toFixed(2);
+      document.getElementById('mmk-input').value = (usd * rates.MMK).toFixed(2);
+    }
+
+    function convertFromMMK(val) {
+      const mmk = parseFloat(val) || 0;
+      const usd = mmk / rates.MMK;
+      document.getElementById('usd-input').value = usd.toFixed(2);
+      document.getElementById('thb-input').value = (usd * rates.THB).toFixed(2);
+    }
+
+    // Init
+    updateGreeting();
+    updateClocks();
+    setInterval(updateClocks, 1000);
+    fetchWeather();
+    fetchRates();
+  </script>
+</body>
+</html>
